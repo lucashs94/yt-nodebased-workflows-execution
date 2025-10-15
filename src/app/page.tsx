@@ -1,11 +1,11 @@
-import { caller } from '@/trpc/server'
+import { requireAuth } from '@/lib/auth-utils'
 
 export default async function Page() {
-  const users = await caller.getUsers()
+  await requireAuth()
 
   return (
-    <div className="">
-      <h1>Hello Page</h1>
+    <div className="min-h-screen min-w-screen flex flex-col gap-6 items-center justify-center">
+      protected server comp.
     </div>
   )
 }
