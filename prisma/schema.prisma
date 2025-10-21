@@ -82,16 +82,12 @@ model Workflow {
   @@map("workflow")
 }
 
-enum NodeType {
-  INITIAL
-}
-
 model Node {
   id         String   @id @default(cuid())
   workflowId String
   workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
   name       String
-  type       NodeType
+  type       String   @default("INITIAL")
   position   Json
   data       Json     @default("{}")
   createdAt  DateTime @default(now())
