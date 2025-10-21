@@ -28,7 +28,7 @@ export default async function Page({ params }: PageProps) {
         <Suspense fallback={<EditorLoading />}>
           <EditorHeader workflowId={workflowId} />
 
-          <main className="flex-1">
+          <main className="flex-1 bg-muted">
             <Editor workflowId={workflowId} />
           </main>
         </Suspense>
