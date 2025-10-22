@@ -1,4 +1,5 @@
 import { TRPCReactProvider } from '@/trpc/client'
+import { Provider as JotaiProvider } from 'jotai'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
@@ -32,8 +33,11 @@ export default function RootLayout({
       >
         <TRPCReactProvider>
           <NuqsAdapter>
-            {children}
-            <Toaster richColors />
+            <JotaiProvider>
+              {children}
+
+              <Toaster richColors />
+            </JotaiProvider>
           </NuqsAdapter>
         </TRPCReactProvider>
       </body>

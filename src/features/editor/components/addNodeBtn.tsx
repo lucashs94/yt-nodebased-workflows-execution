@@ -14,7 +14,6 @@ export const AddNodeBtn = memo(() => {
       onOpenChange={setOpen}
     >
       <Button
-        onClick={() => {}}
         size={'icon'}
         variant={'outline'}
         className="bg-background"

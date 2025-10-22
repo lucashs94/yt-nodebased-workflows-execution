@@ -13,18 +13,37 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
 import {
   useSuspenseWorkflow,
   useUpdateWorkflow,
+  useUpdateWorkflowName,
 } from '@/features/workflows/hooks/useWorkflows'
+import { useAtomValue } from 'jotai'
 import { SaveIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { editorAtom } from '../store/atom'
 
 export function EditorSaveBtn({ workflowId }: { workflowId: string }) {
+  const editor = useAtomValue(editorAtom)
+  const saveWorkflow = useUpdateWorkflow()
+
+  const handleSave = () => {
+    if (!editor) return
+
+    const nodes = editor.getNodes()
+    const edges = editor.getEdges()
+
+    saveWorkflow.mutate({
+      id: workflowId,
+      nodes,
+      edges,
+    })
+  }
+
   return (
     <div className="ml-auto">
       <Button
         size={'sm'}
-        onClick={() => {}}
-        disabled={false}
+        onClick={handleSave}
+        disabled={saveWorkflow.isPending}
       >
         <SaveIcon className="size-4" />
         Save
@@ -35,7 +54,7 @@ export function EditorSaveBtn({ workflowId }: { workflowId: string }) {
 
 export function EditorNameInput({ workflowId }: { workflowId: string }) {
   const { data: workflow } = useSuspenseWorkflow(workflowId)
-  const updateWorkflow = useUpdateWorkflow()
+  const updateWorkflow = useUpdateWorkflowName()
 
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState(workflow.name)
