@@ -1,6 +1,10 @@
 'use client'
 
-import { Position } from '@xyflow/react'
+import {
+  NodeStatus,
+  NodeStatusIndicator,
+} from '@/components/reactFlow/node-status-indicator'
+import { NodeProps, Position, useReactFlow } from '@xyflow/react'
 import { LucideIcon } from 'lucide-react'
 import { memo } from 'react'
 import { WorkflowNode } from '../../../components/nodes/workflowNode'
@@ -10,28 +14,41 @@ import {
   BaseNodeContent,
 } from '../../../components/reactFlow/base-node'
 
-interface BaseExecutionNodeProps {
-  id: string
+interface BaseExecutionNodeProps extends NodeProps {
   icon: LucideIcon | string
   name: string
   description?: string
   children?: React.ReactNode
-  // status?: NodeStatus
+  status?: NodeStatus
   onSettings?: () => void
   onDoubleClick?: () => void
 }
 
 export const BaseExecutionNode = memo(
   ({
+    id,
     icon: Icon,
     name,
     description,
+    status = 'initial',
     children,
     onSettings,
     onDoubleClick,
   }: BaseExecutionNodeProps) => {
+    const { setNodes, setEdges } = useReactFlow()
+
     const handleDelete = () => {
-      console.log('delete node')
+      setNodes((nodes) => {
+        const updatedNodes = nodes.filter((node) => node.id !== id)
+        return updatedNodes
+      })
+
+      setEdges((edges) => {
+        const updatedEdges = edges.filter(
+          (edge) => edge.source !== id && edge.target !== id
+        )
+        return updatedEdges
+      })
     }
 
     return (
@@ -41,33 +58,41 @@ export const BaseExecutionNode = memo(
         onDelete={handleDelete}
         onSettings={onSettings}
       >
-        <BaseNode onDoubleClick={onDoubleClick}>
-          <BaseNodeContent>
-            {typeof Icon === 'string' ? (
-              <img
-                src={Icon}
-                alt={name}
-                width={16}
-                height={16}
+        <NodeStatusIndicator
+          status={status}
+          variant="border"
+        >
+          <BaseNode
+            onDoubleClick={onDoubleClick}
+            status={status}
+          >
+            <BaseNodeContent>
+              {typeof Icon === 'string' ? (
+                <img
+                  src={Icon}
+                  alt={name}
+                  width={16}
+                  height={16}
+                />
+              ) : (
+                <Icon className="size-4 text-muted-foreground" />
+              )}
+
+              {children}
+
+              <BaseHandle
+                id={`target-1`}
+                type="target"
+                position={Position.Left}
               />
-            ) : (
-              <Icon className="size-4 text-muted-foreground" />
-            )}
-
-            {children}
-
-            <BaseHandle
-              id={`target-1`}
-              type="target"
-              position={Position.Left}
-            />
-            <BaseHandle
-              id={`source-1`}
-              type="source"
-              position={Position.Right}
-            />
-          </BaseNodeContent>
-        </BaseNode>
+              <BaseHandle
+                id={`source-1`}
+                type="source"
+                position={Position.Right}
+              />
+            </BaseNodeContent>
+          </BaseNode>
+        </NodeStatusIndicator>
       </WorkflowNode>
     )
   }
