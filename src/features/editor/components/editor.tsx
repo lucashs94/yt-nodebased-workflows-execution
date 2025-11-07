@@ -16,13 +16,15 @@ import {
   Panel,
   ReactFlow,
 } from '@xyflow/react'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { nodeComponents } from '@/config/nodeComponents'
+import { NodeType } from '@/types/nodes'
 import '@xyflow/react/dist/style.css'
 import { useSetAtom } from 'jotai'
 import { editorAtom } from '../store/atom'
 import { AddNodeBtn } from './addNodeBtn'
+import { ExecuteWorkflowBtn } from './executeWorkflowBtn'
 
 export const EditorLoading = () => {
   return <LoadingView message="Loading editor..." />
@@ -56,6 +58,10 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
     []
   )
 
+  const hasManualTrigger = useMemo(() => {
+    return nodes.some((node) => node.type === NodeType.MANUAL_TRIGGER)
+  }, [nodes])
+
   return (
     <div className="size-full">
       <ReactFlow
@@ -82,6 +88,12 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
         <Panel position="top-right">
           <AddNodeBtn />
         </Panel>
+
+        {hasManualTrigger && (
+          <Panel position="bottom-center">
+            <ExecuteWorkflowBtn workflowId={workflowId} />
+          </Panel>
+        )}
       </ReactFlow>
     </div>
   )
