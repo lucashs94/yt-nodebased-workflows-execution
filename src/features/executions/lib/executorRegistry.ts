@@ -1,3 +1,4 @@
+import { googleFormsTriggerExecutor } from '@/features/triggers/components/googleFormsTrigger/executor'
 import { manualTriggerExecutor } from '@/features/triggers/components/manualTrigger/executor'
 import { NodeType } from '@/types/nodes'
 import { httpRequestExecutor } from '../components/httpRequest/executor'
@@ -7,6 +8,7 @@ export const executorRegistry: Record<NodeType, NodeExecutor> = {
   [NodeType.INITIAL]: manualTriggerExecutor,
   [NodeType.MANUAL_TRIGGER]: manualTriggerExecutor,
   [NodeType.HTTP_REQUEST]: httpRequestExecutor,
+  [NodeType.GOOGLE_FORMS_TRIGGER]: googleFormsTriggerExecutor,
 }
 
 export const getExecutor = (type: NodeType): NodeExecutor => {
