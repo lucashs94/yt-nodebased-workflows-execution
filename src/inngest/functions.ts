@@ -3,16 +3,20 @@ import { inngest } from '@/inngest/client'
 import prisma from '@/lib/db'
 import { NodeType } from '@/types/nodes'
 import { NonRetriableError } from 'inngest'
+import { httpRequestChannel } from './channels/httpRequest'
+import { manualTriggerChannel } from './channels/manualTrigger'
 import { topologicalSort } from './utils'
 
 export const executeWorkflow = inngest.createFunction(
   {
     id: 'execute-workflow',
+    retries: 0, // TODO: Change for deploy
   },
   {
     event: 'workflows/execute.workflow',
+    channels: [httpRequestChannel(), manualTriggerChannel()],
   },
-  async ({ event, step }) => {
+  async ({ event, step, publish }) => {
     const workflowId = event.data.workflowId
 
     if (!workflowId) {
@@ -41,6 +45,7 @@ export const executeWorkflow = inngest.createFunction(
         context,
         nodeId: node.id,
         step,
+        publish,
       })
     }
 

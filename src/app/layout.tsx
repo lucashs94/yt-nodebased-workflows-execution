@@ -1,5 +1,6 @@
 import { TRPCReactProvider } from '@/trpc/client'
 import { Provider as JotaiProvider } from 'jotai'
+import { BadgeAlertIcon, BadgeCheckIcon, BadgeXIcon } from 'lucide-react'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
@@ -36,7 +37,15 @@ export default function RootLayout({
             <JotaiProvider>
               {children}
 
-              <Toaster richColors />
+              <Toaster
+                closeButton
+                swipeDirections={['bottom', 'right']}
+                icons={{
+                  success: <BadgeCheckIcon className="text-emerald-500" />,
+                  error: <BadgeXIcon className="text-red-500" />,
+                  warning: <BadgeAlertIcon className="text-yellow-600" />,
+                }}
+              />
             </JotaiProvider>
           </NuqsAdapter>
         </TRPCReactProvider>
