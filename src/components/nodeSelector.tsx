@@ -30,6 +30,12 @@ const triggerNodes: NodeTypeOption[] = [
     description: 'Trigger the workflow manually clicking a button',
     icon: MousePointerIcon,
   },
+  {
+    type: NodeType.GOOGLE_FORMS_TRIGGER,
+    label: 'Google Forms Trigger',
+    description: 'Trigger the workflow when a Google Forms is submitted',
+    icon: '/logos/googleform.svg',
+  },
 ]
 
 const executionNodes: NodeTypeOption[] = [
