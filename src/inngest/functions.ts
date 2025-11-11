@@ -6,6 +6,7 @@ import { NonRetriableError } from 'inngest'
 import { googleFormsTriggerChannel } from './channels/googleFormsTrigger'
 import { httpRequestChannel } from './channels/httpRequest'
 import { manualTriggerChannel } from './channels/manualTrigger'
+import { stripeTriggerChannel } from './channels/stripeTrigger'
 import { topologicalSort } from './utils'
 
 export const executeWorkflow = inngest.createFunction(
@@ -19,6 +20,7 @@ export const executeWorkflow = inngest.createFunction(
       httpRequestChannel(),
       manualTriggerChannel(),
       googleFormsTriggerChannel(),
+      stripeTriggerChannel(),
     ],
   },
   async ({ event, step, publish }) => {

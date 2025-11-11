@@ -10,9 +10,9 @@ Handlebars.registerHelper('json', (context) => {
 })
 
 type HttpRequestData = {
-  variableName: string
-  endpoint: string
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+  variableName?: string
+  endpoint?: string
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   body?: string
 }
 
@@ -30,19 +30,21 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
     })
   )
 
-  if (!data.endpoint || !data.variableName || !data.method) {
-    await publish(
-      httpRequestChannel().status({
-        nodeId,
-        status: 'error',
-      })
-    )
-
-    throw new NonRetriableError(`HTTP Request node: No all infos configured`)
-  }
-
   try {
     const result = await step.run('http-request', async () => {
+      if (!data.endpoint || !data.variableName || !data.method) {
+        await publish(
+          httpRequestChannel().status({
+            nodeId,
+            status: 'error',
+          })
+        )
+
+        throw new NonRetriableError(
+          `HTTP Request node: No all infos configured`
+        )
+      }
+
       const method = data.method
       const endpoint = Handlebars.compile(data.endpoint)(context)
 
