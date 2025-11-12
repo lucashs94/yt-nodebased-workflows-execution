@@ -1,5 +1,5 @@
 import { NodeExecutor } from '@/features/executions/types'
-import { httpRequestChannel } from '@/inngest/channels/httpRequest'
+import { statusChannel } from '@/inngest/channels/statusChannel'
 import Handlebars from 'handlebars'
 import { NonRetriableError } from 'inngest'
 import ky, { Options as KyOptions } from 'ky'
@@ -24,7 +24,7 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
   publish,
 }) => {
   await publish(
-    httpRequestChannel().status({
+    statusChannel().status({
       nodeId,
       status: 'loading',
     })
@@ -34,7 +34,7 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
     const result = await step.run('http-request', async () => {
       if (!data.endpoint || !data.variableName || !data.method) {
         await publish(
-          httpRequestChannel().status({
+          statusChannel().status({
             nodeId,
             status: 'error',
           })
@@ -83,7 +83,7 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
     })
 
     await publish(
-      httpRequestChannel().status({
+      statusChannel().status({
         nodeId,
         status: 'success',
       })
@@ -92,7 +92,7 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
     return result
   } catch (error) {
     await publish(
-      httpRequestChannel().status({
+      statusChannel().status({
         nodeId,
         status: 'error',
       })

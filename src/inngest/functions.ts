@@ -3,10 +3,7 @@ import { inngest } from '@/inngest/client'
 import prisma from '@/lib/db'
 import { NodeType } from '@/types/nodes'
 import { NonRetriableError } from 'inngest'
-import { googleFormsTriggerChannel } from './channels/googleFormsTrigger'
-import { httpRequestChannel } from './channels/httpRequest'
-import { manualTriggerChannel } from './channels/manualTrigger'
-import { stripeTriggerChannel } from './channels/stripeTrigger'
+import { statusChannel } from './channels/statusChannel'
 import { topologicalSort } from './utils'
 
 export const executeWorkflow = inngest.createFunction(
@@ -16,12 +13,7 @@ export const executeWorkflow = inngest.createFunction(
   },
   {
     event: 'workflows/execute.workflow',
-    channels: [
-      httpRequestChannel(),
-      manualTriggerChannel(),
-      googleFormsTriggerChannel(),
-      stripeTriggerChannel(),
-    ],
+    channels: [statusChannel()],
   },
   async ({ event, step, publish }) => {
     const workflowId = event.data.workflowId
@@ -41,6 +33,13 @@ export const executeWorkflow = inngest.createFunction(
 
       return topologicalSort(workflow.nodes, workflow.connections)
     })
+
+    // Dispara evento de start para frontend resetar todos
+    for (const node of sortedNodes) {
+      await publish(
+        statusChannel().status({ nodeId: node.id, status: 'initial' })
+      )
+    }
 
     // Initialize the context with initial data from trigger
     let context = event.data.initialData || {}

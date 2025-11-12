@@ -1,26 +1,19 @@
 import { NodeStatus } from '@/components/reactFlow/node-status-indicator'
-import type { Realtime } from '@inngest/realtime'
+import { STATUS_CHANNEL } from '@/inngest/channels/statusChannel'
 import { useInngestSubscription } from '@inngest/realtime/hooks'
 import { useEffect, useState } from 'react'
+import { fetchStatusRealtimeToken, StatusToken } from '../actions/statusActions'
 
 interface UseNodeStatusOptions {
   nodeId: string
-  channel: string
-  topic: string
-  refreshToken: () => Promise<Realtime.Subscribe.Token>
 }
 
-export const useNodeStatus = ({
-  nodeId,
-  channel,
-  topic,
-  refreshToken,
-}: UseNodeStatusOptions) => {
+export const useNodeStatus = ({ nodeId }: UseNodeStatusOptions) => {
   const [status, setStatus] = useState<NodeStatus>('initial')
 
-  const { data } = useInngestSubscription({
+  const { data } = useInngestSubscription<StatusToken>({
     enabled: true,
-    refreshToken,
+    refreshToken: fetchStatusRealtimeToken,
   })
 
   useEffect(() => {
@@ -30,9 +23,9 @@ export const useNodeStatus = ({
       .filter(
         (message) =>
           message.kind === 'data' &&
-          message.channel === channel &&
-          message.topic === topic &&
-          message.data.nodeId === nodeId
+          message.channel === STATUS_CHANNEL &&
+          message.topic === 'status' &&
+          message.data?.nodeId === nodeId
       )
       .sort((a, b) => {
         if (a.kind === 'data' && b.kind === 'data') {
@@ -47,7 +40,7 @@ export const useNodeStatus = ({
     if (lastMessage?.kind === 'data') {
       setStatus(lastMessage.data.status as NodeStatus)
     }
-  }, [data, channel, topic, nodeId])
+  }, [data, nodeId])
 
   return status
 }

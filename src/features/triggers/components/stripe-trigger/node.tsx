@@ -1,11 +1,9 @@
 'use client'
 
 import { useNodeStatus } from '@/features/executions/hooks/useNodeStatus'
-import { STRIPE_TRIGGER_CHANNEL_NAME } from '@/inngest/channels/stripeTrigger'
 import { NodeProps } from '@xyflow/react'
 import { memo, useState } from 'react'
 import { BaseTriggerNode } from '../baseTriggerNode'
-import { fetchStripeTriggerRealtimeToken } from './actions'
 import { ConfigDialog } from './dialog'
 
 export const StripeTriggerNode = memo((props: NodeProps) => {
@@ -13,9 +11,6 @@ export const StripeTriggerNode = memo((props: NodeProps) => {
 
   const nodeStatus = useNodeStatus({
     nodeId: props.id,
-    channel: STRIPE_TRIGGER_CHANNEL_NAME,
-    topic: 'status',
-    refreshToken: fetchStripeTriggerRealtimeToken,
   })
 
   const handleOpenSettings = () => {

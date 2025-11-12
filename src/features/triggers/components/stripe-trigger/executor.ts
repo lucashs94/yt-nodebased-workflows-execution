@@ -1,5 +1,5 @@
 import { NodeExecutor } from '@/features/executions/types'
-import { stripeTriggerChannel } from '@/inngest/channels/stripeTrigger'
+import { statusChannel } from '@/inngest/channels/statusChannel'
 
 type StripeTriggerData = Record<string, unknown>
 
@@ -10,7 +10,7 @@ export const stripeTriggerExecutor: NodeExecutor<StripeTriggerData> = async ({
   publish,
 }) => {
   await publish(
-    stripeTriggerChannel().status({
+    statusChannel().status({
       nodeId,
       status: 'loading',
     })
@@ -19,7 +19,7 @@ export const stripeTriggerExecutor: NodeExecutor<StripeTriggerData> = async ({
   const result = await step.run('stripe-trigger', async () => context)
 
   await publish(
-    stripeTriggerChannel().status({
+    statusChannel().status({
       nodeId,
       status: 'success',
     })
