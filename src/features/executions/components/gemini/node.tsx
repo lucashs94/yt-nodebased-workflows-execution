@@ -1,22 +1,20 @@
 'use client'
 
 import { useReactFlow, type Node, type NodeProps } from '@xyflow/react'
-import { GlobeIcon } from 'lucide-react'
 import { memo, useState } from 'react'
 import { useNodeStatus } from '../../hooks/useNodeStatus'
 import { BaseExecutionNode } from '../baseExecutionNode'
-import { HttpRequestDialog, HttpRequestFormValues } from './dialog'
+import { AVAILABLE_MODELS, ConfigDialog, FormValues } from './dialog'
 
-type HttpRequestNodeProps = {
-  variableName?: string
-  endpoint?: string
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
-  body?: string
+type GeminiNodeProps = {
+  model?: (typeof AVAILABLE_MODELS)[number]
+  systemPrompt?: string
+  userPrompt?: string
 }
 
-type HttpRequestNodeType = Node<HttpRequestNodeProps>
+type GeminiNodeType = Node<GeminiNodeProps>
 
-export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
+export const GeminiNode = memo((props: NodeProps<GeminiNodeType>) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const { setNodes } = useReactFlow()
 
@@ -28,7 +26,7 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
     setDialogOpen(true)
   }
 
-  const handleSubmit = (values: HttpRequestFormValues) => {
+  const handleSubmit = (values: FormValues) => {
     setNodes((nodes) =>
       nodes.map((node) => {
         if (node.id === props.id) {
@@ -47,13 +45,16 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
   }
 
   const nodeData = props.data
-  const description = nodeData?.endpoint
-    ? `${nodeData.method || 'GET'}: ${nodeData.endpoint}`
+  const description = nodeData?.userPrompt
+    ? `${nodeData.model || AVAILABLE_MODELS[0]}: ${nodeData.userPrompt.slice(
+        0,
+        50
+      )}...`
     : 'Not configured'
 
   return (
     <>
-      <HttpRequestDialog
+      <ConfigDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onSubmit={handleSubmit}
@@ -63,8 +64,8 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
       <BaseExecutionNode
         {...props}
         id={props.id}
-        icon={GlobeIcon}
-        name="HTTP Request"
+        icon={'/logos/gemini.svg'}
+        name="Gemini"
         description={description}
         status={nodeStatus}
         onSettings={handleOpenSettings}
@@ -73,3 +74,5 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
     </>
   )
 })
+
+GeminiNode.displayName = 'GeminiNode'

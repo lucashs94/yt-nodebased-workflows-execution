@@ -1,5 +1,5 @@
 import { NodeExecutor } from '@/features/executions/types'
-import { manualTriggerChannel } from '@/inngest/channels/manualTrigger'
+import { statusChannel } from '@/inngest/channels/statusChannel'
 
 type ManualTriggerData = Record<string, unknown>
 
@@ -10,7 +10,7 @@ export const manualTriggerExecutor: NodeExecutor<ManualTriggerData> = async ({
   publish,
 }) => {
   await publish(
-    manualTriggerChannel().status({
+    statusChannel().status({
       nodeId,
       status: 'loading',
     })
@@ -19,7 +19,7 @@ export const manualTriggerExecutor: NodeExecutor<ManualTriggerData> = async ({
   const result = await step.run('manual-trigger', async () => context)
 
   await publish(
-    manualTriggerChannel().status({
+    statusChannel().status({
       nodeId,
       status: 'success',
     })
