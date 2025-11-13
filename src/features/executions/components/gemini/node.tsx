@@ -8,6 +8,7 @@ import { AVAILABLE_MODELS, ConfigDialog, FormValues } from './dialog'
 
 type GeminiNodeProps = {
   model?: (typeof AVAILABLE_MODELS)[number]
+  credentialId?: string
   systemPrompt?: string
   userPrompt?: string
 }
