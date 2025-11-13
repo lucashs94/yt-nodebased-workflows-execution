@@ -27,7 +27,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useCredentialsByType } from '@/features/credentials/hooks/useCredentials'
+import { CredentialType } from '@/types/credentials'
 import { zodResolver } from '@hookform/resolvers/zod'
+import Image from 'next/image'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -49,6 +52,7 @@ const formSchema = z.object({
       'Variable name must start with letters or underscore and contain only letters, numbers and underscore'
     ),
   model: z.enum(AVAILABLE_MODELS),
+  credentialId: z.string().min(1, 'Credential is required'),
   systemPrompt: z.string().optional(),
   userPrompt: z.string().min(1, 'User prompt is required'),
 })
@@ -68,11 +72,15 @@ export const ConfigDialog = ({
   onSubmit,
   defaultValues = {},
 }: Props) => {
+  const { data: credentials, isLoading: isLoadingCredentials } =
+    useCredentialsByType(CredentialType.ANTHROPIC)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       variableName: defaultValues.variableName || '',
       model: defaultValues.model || AVAILABLE_MODELS[0],
+      credentialId: defaultValues.credentialId || '',
       systemPrompt: defaultValues.systemPrompt || '',
       userPrompt: defaultValues.userPrompt || '',
     },
@@ -90,6 +98,7 @@ export const ConfigDialog = ({
       form.reset({
         variableName: defaultValues.variableName || '',
         model: defaultValues.model || AVAILABLE_MODELS[0],
+        credentialId: defaultValues.credentialId || '',
         systemPrompt: defaultValues.systemPrompt || '',
         userPrompt: defaultValues.userPrompt || '',
       })
@@ -170,6 +179,52 @@ export const ConfigDialog = ({
 
                   <FormDescription>
                     The Anthropic model to use for completion
+                  </FormDescription>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="credentialId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Credential</FormLabel>
+
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={isLoadingCredentials || !credentials?.length}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a credential" />
+                      </SelectTrigger>
+                    </FormControl>
+
+                    <SelectContent>
+                      {credentials?.map((credential) => (
+                        <SelectItem
+                          key={credential.id}
+                          value={credential.id}
+                        >
+                          <Image
+                            src={'/logos/anthropic.svg'}
+                            alt={credential.name}
+                            width={16}
+                            height={16}
+                          />
+
+                          {credential.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <FormDescription>
+                    The credential to use AI api call
                   </FormDescription>
 
                   <FormMessage />
